@@ -70,15 +70,19 @@ async def on_message(message: discord.Message):
         await message.channel.send(embed=embed, content=usr)
     elif message.content.lower().startswith("!makeann"):
         try:
-            type, resource, price = message.content[8:].split(sep=";")
+            type, resource, price = message.content[9:].split(sep=";")
         except ValueError:
             await message.reply("Ошибка в синтаксисе команды")
         embed = discord.Embed(title="Объявление", colour=int("2f3136", base=16))
-        embed.add_field(name="Тип", value="Продажа" if type==1 else "Покупка")
+        embed.add_field(name="Тип", value="Продажа" if type=="1" else "Покупка")
         embed.add_field(name="Ресурсы", value=resource)
         embed.add_field(name="Цена", value=f"{price} <:lar:858797748924448788>")
-        embed.set_footer(icon_url=message.author.avatar_url, text=message.author.name + "#" + message.author.discriminator)
+        embed.set_footer(icon_url=message.author.avatar_url, text=message.author.name)
         await message.channel.send(embed=embed)
+        await message.delete()
+        return
+    elif message.channel.id == 858986069553840138:
+        await message.delete()
 
 
 

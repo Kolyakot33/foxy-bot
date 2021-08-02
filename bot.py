@@ -121,7 +121,7 @@ async def on_message(message: discord.Message):
         await message.delete()
     return
 
-@slash.component_callback()
+@client.event
 async def delmsg(ctx: ComponentContext):
     print(ctx.author_id)
     cur = con.cursor()

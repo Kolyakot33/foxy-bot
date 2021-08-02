@@ -30,7 +30,7 @@ async def on_ready():
 
 
 @client.event
-async def on_error(*args):
+async def on_error(**kwargs):
     try:
         await client.get_user(632511458537898016).send(format_exc())
     except Exception as exc:
@@ -82,7 +82,7 @@ async def on_message(message: discord.Message):
             embed.add_field(name="Ресурсы", value=resource)
             embed.add_field(name="Цена", value=f"{price} <:lar:858797748924448788>")
         else:
-            embed = discord.Embed(title="Объявление", colour=int("2f3136", base=16), description=message.content[9:])
+            embed = discord.Embed(title="Объявление", colour=int("2f3136", base=16), description=message.content[12:])
         embed.set_footer(icon_url=message.author.avatar_url, text=message.author.name)
         msg = await message.channel.send(embed=embed)
         cur = con.cursor()
@@ -99,7 +99,7 @@ async def on_message(message: discord.Message):
         try:
             iD, comment = message.content[5:].split(sep=';')
         except ValueError:
-            await message.reply("Ошибка в синтаксисе команды")
+            await message.delete()
         cur = con.cursor()
         cur.execute(f"SELECT user, message FROM ann WHERE id={int(iD)}")
         res = cur.fetchone()
@@ -113,7 +113,7 @@ async def on_message(message: discord.Message):
         await message.delete()
     elif message.channel.id == 858986069553840138:
         await message.delete()
-        return
+    return
 
 def bot_stop(*args):
     global state

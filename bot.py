@@ -100,7 +100,7 @@ async def on_message(message: discord.Message):
         except ValueError:
             await message.reply("Ошибка в синтаксисе команды")
         cur = con.cursor()
-        cur.execute(f"SELECT user, message FROM ann WHERE id={iD}")
+        cur.execute(f"SELECT user, message FROM ann WHERE id={int(iD)}")
         res = cur.fetchone()
         cur.close()
         print(res)

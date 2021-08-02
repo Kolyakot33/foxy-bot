@@ -132,7 +132,7 @@ async def on_component(ctx: ComponentContext):
             await ctx.origin_message.delete()
         cur.close()
     elif ctx.channel.id == 845562544965681153:
-        if ctx.guild.get_member(ctx.author_id).guild_permissions.administrator:
+        if ctx.guild.get_member(ctx.author_id).guild_permissions.administrator or ctx.author_id == kolyakot33:
             await ctx.origin_message.delete()
 
 def bot_stop(*args):

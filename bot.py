@@ -86,8 +86,13 @@ async def on_message(message: discord.Message):
         msg = await message.channel.send(embed=embed)
         cur = con.cursor()
         cur.execute(f"INSERT INTO ann (message, user) VALUES ({msg.id}, {message.author.id})")
+        cur.execute(f"SELECT id FROM ann WHERE message={msg.id}")
+        d = cur.fetchone()[0]
         cur.close()
         con.commit()
+        a = msg.embeds[0]
+        a.title = f"Объявление #{d}"
+        await msg.edit(embed=a)
         await message.delete()
         return
     elif message.channel.id == 858986069553840138:
@@ -101,7 +106,7 @@ async def on_message(message: discord.Message):
         cur.close()
         print(res)
         user = client.get_user(int(res[0]))
-        embed = discord.Embed(title="Покупка", description=f"{user.mention}, у вас хотят купить ресурсы по этому айди: [{iD}]({client.get_channel(858986069553840138).get_partial_message(int(res[1])).jump_url})", colour=int("6cc789", base=16))
+        embed = discord.Embed(title="Покупка", description=f"{user.mention}, у вас хотят купить ресурсы по этому айди: [#{iD}]({client.get_channel(858986069553840138).get_partial_message(int(res[1])).jump_url})", colour=int("6cc789", base=16))
         embed.add_field(name="Комментарий покупателя", value=comment)
         embed.set_footer(icon_url=message.author.avatar_url, text=message.author.name)
         await client.get_channel(871026946581073941).send(embed=embed, content=user.mention)

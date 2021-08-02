@@ -59,7 +59,7 @@ async def on_message(message: discord.Message):
         else:
             return
     elif message.content.lower().startswith("!pred"):
-        if not message.author.guild_permissions.administrator or not message.author.id == kolyakot33:
+        if not message.author.guild_permissions.administrator and not message.author.id == kolyakot33:
             return
         try:
             usr, reason, task, time, admin = message.content[6:].split(sep=";")

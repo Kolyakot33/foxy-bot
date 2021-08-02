@@ -75,7 +75,7 @@ async def on_message(message: discord.Message):
         await message.channel.send(embed=embed, content=usr)
     elif message.content.lower().startswith("!makeann") and message.channel.id == 858986069553840138:
         smsg = message.content[9:].split(sep=";")
-        if len(smsg) == 3
+        if len(smsg) == 3:
             type, resource, price = smsg
             embed = discord.Embed(title="Объявление", colour=int("2f3136", base=16))
             embed.add_field(name="Тип", value="Продажа" if type == "1" else "Покупка")

@@ -5,7 +5,9 @@ import discord
 from signal import signal, SIGINT, SIGTERM
 from discord.ext import tasks
 import pymysql
-
+from discord_slash import ComponentContext
+from discord_slash.utils.manage_components import create_button, create_actionrow
+from discord_slash.model import ButtonStyle
 client = discord.Client(intents=discord.Intents.all())
 start_time = time()
 state = 1
@@ -84,7 +86,9 @@ async def on_message(message: discord.Message):
         else:
             embed = discord.Embed(title="Объявление", colour=int("2f3136", base=16), description=message.content[11:])
         embed.set_footer(icon_url=message.author.avatar_url, text=message.author.nick)
-        msg = await message.channel.send(embed=embed)
+        msg = await message.channel.send(embed=embed, components=[create_actionrow(
+                                        create_button(style=ButtonStyle.green, label="Удалить(только для создателя)", emoji="<:no:867776679673462785>"))
+                                    ])
         cur = con.cursor()
         cur.execute(f"INSERT INTO ann (message, user) VALUES ({msg.id}, {message.author.id})")
         cur.execute(f"SELECT id FROM ann WHERE message={msg.id}")
@@ -114,6 +118,15 @@ async def on_message(message: discord.Message):
     elif message.channel.id == 858986069553840138:
         await message.delete()
     return
+
+@client.event()
+async def on_component(ctx: ComponentContext):
+    cur = con.cursor()
+    cur.execute(f"SELECT user FROM ann WHERE message={ctx.origin_message.id}")
+    if int(cur.fetchone()[0]) == ctx.author.id:
+        await ctx.origin_message.delete()
+    cur.close()
+
 
 def bot_stop(*args):
     global state

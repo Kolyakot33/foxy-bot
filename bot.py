@@ -82,7 +82,7 @@ async def on_message(message: discord.Message):
             embed.add_field(name="Ресурсы", value=resource)
             embed.add_field(name="Цена", value=f"{price} <:lar:858797748924448788>")
         else:
-            embed = discord.Embed(title="Объявление", colour=int("2f3136", base=16), description=message.content[12:])
+            embed = discord.Embed(title="Объявление", colour=int("2f3136", base=16), description=message.content[11:])
         embed.set_footer(icon_url=message.author.avatar_url, text=message.author.name)
         msg = await message.channel.send(embed=embed)
         cur = con.cursor()

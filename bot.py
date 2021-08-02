@@ -83,7 +83,7 @@ async def on_message(message: discord.Message):
             embed.add_field(name="Цена", value=f"{price} <:lar:858797748924448788>")
         else:
             embed = discord.Embed(title="Объявление", colour=int("2f3136", base=16), description=message.content[11:])
-        embed.set_footer(icon_url=message.author.avatar_url, text=message.author.name)
+        embed.set_footer(icon_url=message.author.avatar_url, text=message.author.nick)
         msg = await message.channel.send(embed=embed)
         cur = con.cursor()
         cur.execute(f"INSERT INTO ann (message, user) VALUES ({msg.id}, {message.author.id})")
@@ -108,7 +108,7 @@ async def on_message(message: discord.Message):
         user = client.get_user(int(res[0]))
         embed = discord.Embed(title="Покупка", description=f"{user.mention}, у вас хотят купить ресурсы по этому айди: [#{iD}]({client.get_channel(858986069553840138).get_partial_message(int(res[1])).jump_url})", colour=int("6cc789", base=16))
         embed.add_field(name="Комментарий покупателя", value=comment)
-        embed.set_footer(icon_url=message.author.avatar_url, text=message.author.name)
+        embed.set_footer(icon_url=message.author.avatar_url, text=message.author.nick)
         await client.get_channel(858986069553840138).send(embed=embed, content=user.mention)
         await message.delete()
     elif message.channel.id == 858986069553840138:

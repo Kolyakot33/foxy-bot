@@ -133,7 +133,9 @@ async def on_component(ctx: ComponentContext):
         cur.close()
     elif ctx.channel.id == 845562544965681153:
         if ctx.guild.get_member(ctx.author_id).guild_permissions.administrator or ctx.author_id == kolyakot33:
-            await ctx.origin_message.delete()
+            a = ctx.origin_message.embeds[0]
+            a.title = "Предупреждение (снято)"
+            await ctx.origin_message.edit(embed=a, components=None)
 
 def bot_stop(*args):
     global state

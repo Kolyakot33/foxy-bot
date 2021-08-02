@@ -119,7 +119,7 @@ async def on_message(message: discord.Message):
         await message.delete()
     return
 
-@client.event()
+@client.event
 async def on_component(ctx: ComponentContext):
     cur = con.cursor()
     cur.execute(f"SELECT user FROM ann WHERE message={ctx.origin_message.id}")

@@ -123,7 +123,7 @@ async def on_message(message: discord.Message):
 async def on_component(ctx: ComponentContext):
     cur = con.cursor()
     cur.execute(f"SELECT user FROM ann WHERE message={ctx.origin_message.id}")
-    if int(cur.fetchone()[0]) == ctx.author.id:
+    if int(cur.fetchone()[0]) == ctx.author_id:
         await ctx.origin_message.delete()
     cur.close()
 

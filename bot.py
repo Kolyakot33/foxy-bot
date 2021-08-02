@@ -87,7 +87,7 @@ async def on_message(message: discord.Message):
             embed = discord.Embed(title="Объявление", colour=int("2f3136", base=16), description=message.content[11:])
         embed.set_footer(icon_url=message.author.avatar_url, text=message.author.nick)
         msg = await message.channel.send(embed=embed, components=[create_actionrow(
-                                        create_button(style=ButtonStyle.green, label="Удалить(только для создателя)", emoji="<:no:867776679673462785>"))
+                                        create_button(style=ButtonStyle.green, label="Удалить(только для создателя)", emoji=client.get_emoji(867776679673462785)))
                                     ])
         cur = con.cursor()
         cur.execute(f"INSERT INTO ann (message, user) VALUES ({msg.id}, {message.author.id})")

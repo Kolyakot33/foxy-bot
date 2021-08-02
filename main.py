@@ -13,7 +13,7 @@ state = 1
 @tasks.loop(seconds=30)
 async def refresh_status():
     await client.change_presence(status=discord.Status.idle, activity=discord.Game(
-        name=f"Задержка: {int(client.latency * 1000)}мс, Аптайм: {int(time() - start_time)}c"))
+        name=f"Задержка: {int(client.latency * 1000)}мс, Аптайм: {int(time() - start_time) / 60.0}м"))
 
 
 @client.event

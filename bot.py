@@ -13,7 +13,7 @@ client = discord.Client(intents=discord.Intents.all())
 slash = SlashCommand(client, sync_commands=True)
 start_time = time()
 state = 1
-
+kolyakot33 = 632511458537898016
 con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
                       database="s24_main")
 
@@ -36,7 +36,7 @@ async def on_ready():
 @client.event
 async def on_error(**kwargs):
     try:
-        await client.get_user(632511458537898016).send(format_exc())
+        await client.get_user(kolyakot33).send(format_exc())
     except Exception as exc:
         print("Fatal Error!", exc)
     finally:
@@ -59,7 +59,7 @@ async def on_message(message: discord.Message):
         else:
             return
     elif message.content.lower().startswith("!pred"):
-        if not message.author.guild_permissions.administrator:
+        if not message.author.guild_permissions.administrator or message.author.id == kolyakot33:
             return
         try:
             usr, reason, task, time, admin = message.content[6:].split(sep=";")
@@ -76,7 +76,9 @@ async def on_message(message: discord.Message):
         elif admin.lower() == "homka":
             embed.set_footer(text="Homka",
                              icon_url="https://cdn.discordapp.com/attachments/843588784126033943/870815009293361173/Screenshot_74.png")
-        await message.channel.send(embed=embed, content=usr)
+        await message.guild.get_channel(845562544965681153).send(embed=embed, content=usr, components=[create_actionrow(
+                                        create_button(style=ButtonStyle.green, emoji=client.get_emoji(867776679673462785)))
+                                    ])
     elif message.content.lower().startswith("!makeann") and message.channel.id == 858986069553840138:
         smsg = message.content[9:].split(sep=";")
         if len(smsg) == 3:
@@ -123,13 +125,15 @@ async def on_message(message: discord.Message):
 
 @client.event
 async def on_component(ctx: ComponentContext):
-    print(ctx.author_id)
-    cur = con.cursor()
-    cur.execute(f"SELECT user FROM ann WHERE message={ctx.origin_message.id}")
-    if int(cur.fetchone()[0]) == ctx.author_id:
-        await ctx.origin_message.delete()
-    cur.close()
-
+    if ctx.channel.id == 858986069553840138:
+        cur = con.cursor()
+        cur.execute(f"SELECT user FROM ann WHERE message={ctx.origin_message.id}")
+        if int(cur.fetchone()[0]) == ctx.author_id:
+            await ctx.origin_message.delete()
+        cur.close()
+    elif ctx.channel.id == 845562544965681153:
+        if ctx.guild.get_member(ctx.author_id).guild_permissions.administrator:
+            await ctx.origin_message.delete()
 
 def bot_stop(*args):
     global state

@@ -8,7 +8,9 @@ import pymysql
 from discord_slash import ComponentContext
 from discord_slash.utils.manage_components import create_button, create_actionrow
 from discord_slash.model import ButtonStyle
+from discord_slash import SlashCommand
 client = discord.Client(intents=discord.Intents.all())
+slash = SlashCommand(client, sync_commands=True)
 start_time = time()
 state = 1
 
@@ -119,8 +121,8 @@ async def on_message(message: discord.Message):
         await message.delete()
     return
 
-@client.event
-async def on_component(ctx: ComponentContext):
+@slash.component_callback()
+async def delmsg(ctx: ComponentContext):
     cur = con.cursor()
     cur.execute(f"SELECT user FROM ann WHERE message={ctx.origin_message.id}")
     if int(cur.fetchone()[0]) == ctx.author_id:

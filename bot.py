@@ -73,7 +73,7 @@ async def on_message(message: discord.Message):
             embed.set_footer(text="Homka",
                              icon_url="https://cdn.discordapp.com/attachments/843588784126033943/870815009293361173/Screenshot_74.png")
         await message.channel.send(embed=embed, content=usr)
-    elif message.content.lower().startswith("!makeann"): # and message.channel.id == 858986069553840138:
+    elif message.content.lower().startswith("!makeann") and message.channel.id == 858986069553840138:
         try:
             type, resource, price = message.content[9:].split(sep=";")
         except ValueError:
@@ -99,7 +99,10 @@ async def on_message(message: discord.Message):
         await message.delete()
         return
     elif message.content.lower().startswith("!buy"):
-        iD, comment = message.content[5:].split(sep=';')
+        try:
+            iD, comment = message.content[5:].split(sep=';')
+        except ValueError:
+            await message.reply("Ошибка в синтаксисе команды")
         cur = con.cursor()
         cur.execute(f"SELECT user, message FROM ann WHERE id={iD}")
         res = cur.fetchone()
@@ -109,7 +112,7 @@ async def on_message(message: discord.Message):
         embed = discord.Embed(title="Покупка", description=f"{user.mention}, у вас хотят купить ресурсы по этому айди: [#{iD}]({client.get_channel(858986069553840138).get_partial_message(int(res[1])).jump_url})", colour=int("6cc789", base=16))
         embed.add_field(name="Комментарий покупателя", value=comment)
         embed.set_footer(icon_url=message.author.avatar_url, text=message.author.name)
-        await client.get_channel(871026946581073941).send(embed=embed, content=user.mention)
+        await client.get_channel(858986069553840138).send(embed=embed, content=user.mention)
 
 def bot_stop(*args):
     global state

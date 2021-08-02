@@ -50,7 +50,7 @@ async def on_message(message: discord.Message):
         return
     elif message.content.lower().startswith("foxy restart"):
         if message.author.id == 632511458537898016:
-            await message.reply("OK")
+            await message.reply("OK", delete_after=10)
             bot_stop()
         else:
             return

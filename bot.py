@@ -93,11 +93,6 @@ async def on_message(message: discord.Message):
         a = msg.embeds[0]
         a.title = f"Объявление #{d}"
         await msg.edit(embed=a)
-        await message.delete()
-        return
-    elif message.channel.id == 858986069553840138:
-        await message.delete()
-        return
     elif message.content.lower().startswith("!buy"):
         try:
             iD, comment = message.content[5:].split(sep=';')
@@ -113,6 +108,9 @@ async def on_message(message: discord.Message):
         embed.add_field(name="Комментарий покупателя", value=comment)
         embed.set_footer(icon_url=message.author.avatar_url, text=message.author.name)
         await client.get_channel(858986069553840138).send(embed=embed, content=user.mention)
+    elif message.channel.id == 858986069553840138:
+        await message.delete()
+        return
 
 def bot_stop(*args):
     global state

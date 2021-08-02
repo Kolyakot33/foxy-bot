@@ -123,6 +123,7 @@ async def on_message(message: discord.Message):
 
 @slash.component_callback()
 async def delmsg(ctx: ComponentContext):
+    print(ctx.author_id)
     cur = con.cursor()
     cur.execute(f"SELECT user FROM ann WHERE message={ctx.origin_message.id}")
     if int(cur.fetchone()[0]) == ctx.author_id:

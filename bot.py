@@ -90,12 +90,7 @@ async def on_message(message: discord.Message):
         if len(smsg) == 3:
             type, resource, price = smsg
             embed = discord.Embed(title="Объявление", colour=int("2f3136", base=16))
-            if type == 1:
-                embed.add_field(name="Тип", value="Продажа")
-            elif type == 2:
-                embed.add_field(name="Тип", value="Покупка")
-            else:
-                await message.delete()
+            embed.add_field(name="Тип", value="Продажа" if type == "1" else "Покупка")
             embed.add_field(name="Ресурсы", value=resource)
             embed.add_field(name="Цена", value=f"{price} <:lar:858797748924448788>")
         else:

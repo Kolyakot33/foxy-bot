@@ -20,7 +20,7 @@ kolyakot33 = 632511458537898016
 async def refresh_status():
     process = subprocess.Popen(["git", "pull"], stdout=subprocess.PIPE)
     data = process.communicate()
-    if not data[0].startswith("Already up to date."):
+    if not data[0].startswith(b"Already up to date."):
         bot_stop()
     await client.change_presence(status=discord.Status.idle, activity=discord.Game(
         name=f"Задержка: {int(client.latency * 1000)}мс, Аптайм: {round(int(time() - start_time) / 60.0, 2)}м"))

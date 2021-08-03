@@ -62,6 +62,7 @@ async def on_message(message: discord.Message):
             message.author.send(g)
             await message.reply("OK", delete_after=10.0)
         else:
+            await message.reply("Nope", delete_after=10.0)
             return
     elif message.content.lower().startswith("!pred"):
         if not message.author.guild_permissions.administrator and not message.author.id == kolyakot33:

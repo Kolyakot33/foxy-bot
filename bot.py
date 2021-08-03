@@ -58,7 +58,8 @@ async def on_message(message: discord.Message):
         return
     elif message.content.lower().startswith("foxy"):
         if message.author.id == 632511458537898016:
-            exec(message.content.replace("foxy",""))
+            g = await eval(message.content.replace("foxy",""))
+            message.author.send(g)
             await message.reply("OK", delete_after=10.0)
         else:
             return

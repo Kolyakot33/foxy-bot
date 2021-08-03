@@ -15,9 +15,6 @@ slash = SlashCommand(client, sync_commands=True)
 start_time = time()
 state = 1
 kolyakot33 = 632511458537898016
-con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
-                      database="s24_main")
-
 
 @tasks.loop(seconds=30)
 async def refresh_status():
@@ -80,7 +77,9 @@ async def on_message(message: discord.Message):
         await message.guild.get_channel(845562544965681153).send(embed=embed, content=usr, components=[create_actionrow(
                                         create_button(style=ButtonStyle.green, emoji=client.get_emoji(867776679673462785)))
                                     ])
-    elif message.content.lower().startswith("!makeann") and message.channel.id == 858986069553840138:
+        return
+
+    if message.content.lower().startswith("!makeann") and message.channel.id == 858986069553840138:
         smsg = message.content[9:].split(sep=";")
         if len(smsg) == 3:
             type, resource, price = smsg
@@ -99,12 +98,15 @@ async def on_message(message: discord.Message):
         msg = await message.channel.send(embed=embed, components=[create_actionrow(
                                         create_button(style=ButtonStyle.green, label="Удалить(только для создателя)", emoji=client.get_emoji(867776679673462785)))
                                     ])
+        con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
+                              database="s24_main")
         cur = con.cursor()
         cur.execute(f"INSERT INTO ann (message, user) VALUES ({msg.id}, {message.author.id})")
         cur.execute(f"SELECT id FROM ann WHERE message={msg.id}")
         d = cur.fetchone()[0]
         cur.close()
         con.commit()
+        con.close()
         a = msg.embeds[0]
         a.title = f"Объявление #{d}"
         await msg.edit(embed=a)
@@ -114,10 +116,13 @@ async def on_message(message: discord.Message):
             iD, comment = message.content[5:].split(sep=';')
         except ValueError:
             await message.delete()
+        con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
+                              database="s24_main")
         cur = con.cursor()
         cur.execute(f"SELECT user, message FROM ann WHERE id={int(iD)}")
         res = cur.fetchone()
         cur.close()
+        con.close()
         print(res)
         user = client.get_user(int(res[0]))
         embed = discord.Embed(title="Покупка", description=f"{user.mention}, у вас хотят купить ресурсы по этому айди: [#{iD}]({client.get_channel(858986069553840138).get_partial_message(int(res[1])).jump_url})", colour=int("6cc789", base=16))
@@ -132,6 +137,8 @@ async def on_message(message: discord.Message):
 @client.event
 async def on_component(ctx: ComponentContext):
     if ctx.channel.id == 858986069553840138:
+        con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
+                              database="s24_main")
         cur = con.cursor()
         cur.execute(f"SELECT user FROM ann WHERE message={ctx.origin_message.id}")
         if int(cur.fetchone()[0]) == ctx.author_id:

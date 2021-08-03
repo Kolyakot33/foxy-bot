@@ -10,11 +10,13 @@ from discord_slash.utils.manage_components import create_button, create_actionro
 from discord_slash.model import ButtonStyle
 from discord_slash import SlashCommand
 import subprocess
+
 client = discord.Client(intents=discord.Intents.all())
 slash = SlashCommand(client, sync_commands=True)
 start_time = time()
 state = 1
 kolyakot33 = 632511458537898016
+
 
 @tasks.loop(seconds=30)
 async def refresh_status():
@@ -79,8 +81,8 @@ async def on_message(message: discord.Message):
             embed.set_footer(text="Homka",
                              icon_url="https://cdn.discordapp.com/attachments/843588784126033943/870815009293361173/Screenshot_74.png")
         await message.guild.get_channel(845562544965681153).send(embed=embed, content=usr, components=[create_actionrow(
-                                        create_button(style=ButtonStyle.green, emoji=client.get_emoji(867776679673462785)))
-                                    ])
+            create_button(style=ButtonStyle.green, emoji=client.get_emoji(867776679673462785)))
+        ])
         return
 
     if message.content.lower().startswith("!makeann") and message.channel.id == 858986069553840138:
@@ -100,8 +102,9 @@ async def on_message(message: discord.Message):
             embed = discord.Embed(title="Объявление", colour=int("2f3136", base=16), description=message.content[11:])
         embed.set_footer(icon_url=message.author.avatar_url, text=message.author.nick)
         msg = await message.channel.send(embed=embed, components=[create_actionrow(
-                                        create_button(style=ButtonStyle.green, label="Удалить(только для создателя)", emoji=client.get_emoji(867776679673462785)))
-                                    ])
+            create_button(style=ButtonStyle.green, label="Удалить(только для создателя)",
+                          emoji=client.get_emoji(867776679673462785)))
+        ])
         con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
                               database="s24_main")
         cur = con.cursor()
@@ -129,7 +132,9 @@ async def on_message(message: discord.Message):
         con.close()
         print(res)
         user = client.get_user(int(res[0]))
-        embed = discord.Embed(title="Покупка", description=f"{user.mention}, у вас хотят купить ресурсы по этому айди: [#{iD}]({client.get_channel(858986069553840138).get_partial_message(int(res[1])).jump_url})", colour=int("6cc789", base=16))
+        embed = discord.Embed(title="Покупка",
+                              description=f"{user.mention}, у вас хотят купить ресурсы по этому айди: [#{iD}]({client.get_channel(858986069553840138).get_partial_message(int(res[1])).jump_url})",
+                              colour=int("6cc789", base=16))
         embed.add_field(name="Комментарий покупателя", value=comment)
         embed.set_footer(icon_url=message.author.avatar_url, text=message.author.nick)
         await client.get_channel(858986069553840138).send(embed=embed, content=user.mention)
@@ -137,6 +142,7 @@ async def on_message(message: discord.Message):
     elif message.channel.id == 858986069553840138:
         await message.delete()
     return
+
 
 @client.event
 async def on_component(ctx: ComponentContext):
@@ -154,6 +160,7 @@ async def on_component(ctx: ComponentContext):
             embed.title = "Предупреждение (снято)"
             embed.color = int("6cc789", base=16)
             await ctx.origin_message.edit(embed=embed, components=None)
+
 
 def bot_stop(*args):
     global state

@@ -9,6 +9,7 @@ from discord_slash import ComponentContext
 from discord_slash.utils.manage_components import create_button, create_actionrow
 from discord_slash.model import ButtonStyle
 from discord_slash import SlashCommand
+import subprocess
 client = discord.Client(intents=discord.Intents.all())
 slash = SlashCommand(client, sync_commands=True)
 start_time = time()
@@ -34,7 +35,7 @@ async def on_ready():
 
 
 @client.event
-async def on_error(**kwargs):
+async def on_error(*args, **kwargs):
     try:
         await client.get_user(kolyakot33).send(format_exc())
     except Exception as exc:
@@ -84,7 +85,12 @@ async def on_message(message: discord.Message):
         if len(smsg) == 3:
             type, resource, price = smsg
             embed = discord.Embed(title="Объявление", colour=int("2f3136", base=16))
-            embed.add_field(name="Тип", value="Продажа" if type == "1" else "Покупка")
+            if type == 1:
+                embed.add_field(name="Тип", value="Продажа")
+            elif type == 2:
+                embed.add_field(name="Тип", value="Покупка")
+            else:
+                await message.delete()
             embed.add_field(name="Ресурсы", value=resource)
             embed.add_field(name="Цена", value=f"{price} <:lar:858797748924448788>")
         else:

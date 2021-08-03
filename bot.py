@@ -164,7 +164,6 @@ def bot_stop(*args):
     refresh_status.stop()
     for task in asyncio.all_tasks():
         task.cancel()
-    con.close()
     asyncio.get_running_loop().stop()
     print("Stop completed!")
 

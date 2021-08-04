@@ -166,12 +166,7 @@ async def on_component(ctx: ComponentContext):
         cur.close()
         con.close()
     else:
-        cur.execute(f"SELECT message FROM tickets WHERE message={ctx.origin_message_id}")
-        a = cur.fetchone()
-        if a:
-            await ctx.origin_message.delete()
-        else:
-            return
+        await ctx.origin_message.delete()
 
 def bot_stop(*args):
     global state

@@ -156,7 +156,7 @@ async def on_component(ctx: ComponentContext):
         channel = await ctx.guild.create_text_channel(name=f"Тикет-{cur.fetchone()[0]}", overwrites={
             ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
             ctx.author: discord.PermissionOverwrite(read_messages=True)
-        })
+        }, category=ctx.guild.get_channel(872495698598309918))
         msg = await channel.send(content="{ctx.author.mention} опишите вашу проблему.",
                            components=[
                                create_actionrow(

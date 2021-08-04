@@ -80,9 +80,7 @@ async def on_message(message: discord.Message):
         elif admin.lower() == "homka":
             embed.set_footer(text="Homka",
                              icon_url="https://cdn.discordapp.com/attachments/843588784126033943/870815009293361173/Screenshot_74.png")
-        await message.guild.get_channel(845562544965681153).send(embed=embed, content=usr, components=[create_actionrow(
-            create_button(style=ButtonStyle.green, emoji=client.get_emoji(867776679673462785)))
-        ])
+        await message.guild.get_channel(845562544965681153).send(embed=embed, content=usr)
         return
 
     if message.content.lower().startswith("!makeann") and message.channel.id == 858986069553840138:
@@ -149,12 +147,6 @@ async def on_component(ctx: ComponentContext):
         if int(cur.fetchone()[0]) == ctx.author_id:
             await ctx.origin_message.delete()
         cur.close()
-    elif ctx.channel.id == 845562544965681153:
-        if ctx.guild.get_member(ctx.author_id).guild_permissions.administrator or ctx.author_id == kolyakot33:
-            embed = ctx.origin_message.embeds[0]
-            embed.title = "Предупреждение (снято)"
-            embed.color = int("6cc789", base=16)
-            await ctx.origin_message.edit(embed=embed, components=None)
 
 
 def bot_stop(*args):

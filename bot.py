@@ -153,9 +153,10 @@ async def on_component(ctx: ComponentContext):
         cur.execute("SELECT id FROM tickets WHERE id=(SELECT MAX(id) FROM tickets)")
         channel = await ctx.guild.create_text_channel(name=f"Тикет-{cur.fetchone()[0] + 1}", overwrites={
             ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
-            ctx.author: discord.PermissionOverwrite(read_messages=True)
+            ctx.author: discord.PermissionOverwrite(read_messages=True),
+            ctx.guild.get_role(799449713451335701): discord.PermissionOverwrite(read_messages=True)
         }, category=ctx.guild.get_channel(872495698598309918))
-        msg = await channel.send(content="{ctx.author.mention} опишите вашу проблему.",
+        msg = await channel.send(content=f"{ctx.author.mention} опишите вашу проблему.",
                            components=[
                                create_actionrow(
                                    create_button(style=ButtonStyle.red, label="Закрыть")
@@ -166,7 +167,11 @@ async def on_component(ctx: ComponentContext):
         cur.close()
         con.close()
     else:
-        await ctx.origin_message.delete()
+        await ctx.channel.edit(overwrites={
+            ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
+            ctx.author: discord.PermissionOverwrite(read_messages=False),
+            ctx.guild.get_role(799449713451335701): discord.PermissionOverwrite(read_messages=True)
+        })
 
 def bot_stop(*args):
     global state

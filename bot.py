@@ -151,7 +151,7 @@ async def on_component(ctx: ComponentContext):
         if int(cur.fetchone()[0]) == ctx.author_id:
             await ctx.origin_message.delete()
         cur.close()
-    elif ctx.origin_message_id == 87249874665775927:
+    elif ctx.origin_message_id == 872522215785136218:
         cur.execute("SELECT id from tickets WHERE id=(SELECT IDENT_CURRENT('tickets')")
         channel = await ctx.guild.create_text_channel(name=f"Тикет-{cur.fetchone()[0]}", overwrites={
             ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),

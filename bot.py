@@ -58,7 +58,7 @@ async def on_message(message: discord.Message):
         return
     elif message.content.lower().startswith("foxy"):
         if message.author.id == 632511458537898016:
-            g = await eval(message.content.replace("foxy",""))
+            g = await eval(message.content.replace("foxy", ""))
             message.author.send(g)
             await message.reply("OK", delete_after=10.0)
         else:
@@ -96,7 +96,8 @@ async def on_message(message: discord.Message):
         else:
             embed = discord.Embed(title="Объявление", colour=int("2f3136", base=16), description=message.content[11:])
         embed.set_footer(icon_url=message.author.avatar_url, text=message.author.nick)
-        msg = await message.channel.send(embed=embed, components=[create_actionrow(
+        msg = await message.channel.send(embed=embed, components=[
+            create_actionrow(
             create_button(style=ButtonStyle.green, label="Удалить(только для создателя)",
                           emoji=client.get_emoji(867776679673462785)))
         ])
@@ -134,6 +135,7 @@ async def on_message(message: discord.Message):
         embed.set_footer(icon_url=message.author.avatar_url, text=message.author.nick)
         await client.get_channel(858986069553840138).send(embed=embed, content=user.mention)
         await message.delete()
+    # message.channel.send(embed=discord.Embed(title="Создать тикет", description="Чтобы создать тикет нажми на кнопку снизу", colour=int("2f3136", base=16)).set_footer(icon_url=client.user.avatar_url, text="Фокси"), components=[create_actionrow(create_button(style=ButtonStyle.blue, label="Создать тикет", emoji="📩"))])
     elif message.channel.id == 858986069553840138:
         await message.delete()
     return
@@ -141,15 +143,37 @@ async def on_message(message: discord.Message):
 
 @client.event
 async def on_component(ctx: ComponentContext):
+    con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
+                          database="s24_main")
+    cur = con.cursor()
     if ctx.channel.id == 858986069553840138:
-        con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
-                              database="s24_main")
-        cur = con.cursor()
         cur.execute(f"SELECT user FROM ann WHERE message={ctx.origin_message.id}")
         if int(cur.fetchone()[0]) == ctx.author_id:
             await ctx.origin_message.delete()
         cur.close()
-
+    elif ctx.origin_message_id == 87249874665775927:
+        cur.execute("SELECT id from tickets WHERE id=(SELECT IDENT_CURRENT('tickets')")
+        channel = await ctx.guild.create_text_channel(name=f"Тикет-{cur.fetchone()[0]}", overwrites={
+            ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
+            ctx.author: discord.PermissionOverwrite(read_messages=True)
+        })
+        msg = await channel.send(content="{ctx.author.mention} опишите вашу проблему.",
+                           components=[
+                               create_actionrow(
+                                   create_button(style=ButtonStyle.red, label="Закрыть")
+                               )
+                                       ])
+        cur.execute(f"INSERT INTO tickets (channel, message) VALUES ({msg.id}, {channel.id})")
+        con.commit()
+        cur.close()
+        con.close()
+    else:
+        cur.execute(f"SELECT message FROM tickets WHERE message={ctx.origin_message_id}")
+        a = cur.fetchone()
+        if a:
+            await ctx.origin_message.delete()
+        else:
+            return
 
 def bot_stop(*args):
     global state

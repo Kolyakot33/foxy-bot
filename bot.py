@@ -59,7 +59,7 @@ async def on_message(message: discord.Message):
     elif message.content.lower().startswith("foxy"):
         if message.author.id == 632511458537898016:
             g = await eval(message.content.replace("foxy", ""))
-            message.author.send(g)
+            await message.author.send(g)
             await message.reply("OK", delete_after=10.0)
         else:
             await message.reply("Nope", delete_after=10.0)
@@ -133,7 +133,7 @@ async def on_message(message: discord.Message):
         embed.set_footer(icon_url=message.author.avatar_url, text=message.author.nick)
         await client.get_channel(858986069553840138).send(embed=embed, content=user.mention)
         await message.delete()
-    # message.channel.send(embed=discord.Embed(title="Создать тикет", description="Чтобы создать тикет нажми на кнопку снизу", colour=int("2f3136", base=16)).set_footer(icon_url=client.user.avatar_url, text="Фокси"), components=[create_actionrow(create_button(style=ButtonStyle.blue, label="Создать тикет", emoji="📩"))])
+#    message.channel.send(embed=discord.Embed(title="Создать тикет", description="Чтобы создать тикет нажми на кнопку снизу",colour=int("2f3136", base=16)).set_footer(icon_url=client.user.avatar_url, text="Фокси"),components=[create_actionrow(create_button(style=ButtonStyle.blue, label="Создать тикет", emoji=":envelope_with_arrow:",custom_id="new_ticket"))])
     elif message.channel.id == 858986069553840138:
         await message.delete()
     return
@@ -165,7 +165,7 @@ async def new_ticket(ctx : ComponentContext):
     msg = await channel.send(content=f"{ctx.author.mention} опишите вашу проблему.",
                              components=[
                                  create_actionrow(
-                                     create_button(style=ButtonStyle.red, label="Закрыть")
+                                     create_button(style=ButtonStyle.red, label="Закрыть", custom_id="close_ticket")
                                  )
                              ])
     cur.execute(f"INSERT INTO tickets (channel, message) VALUES ({msg.id}, {channel.id})")
@@ -180,7 +180,7 @@ async def close_ticket(ctx : ComponentContext):
         ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
         ctx.author: discord.PermissionOverwrite(read_messages=False),
         ctx.guild.get_role(799449713451335701): discord.PermissionOverwrite(read_messages=True)
-    })
+    }, name="(Закрыт) " + ctx.channel.name.lower())
     await ctx.channel.send(f"Тикет закрыт {ctx.author.mention}")
 
 

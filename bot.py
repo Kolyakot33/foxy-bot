@@ -97,7 +97,7 @@ async def on_message(message: discord.Message):
         msg = await message.channel.send(embed=embed, components=[
             create_actionrow(
             create_button(style=ButtonStyle.green, label="Удалить(только для создателя)",
-                          emoji=client.get_emoji(867776679673462785)))
+                          emoji=client.get_emoji(867776679673462785), custom_id="remove_ann"))
         ])
         con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
                               database="s24_main")
@@ -139,41 +139,6 @@ async def on_message(message: discord.Message):
     return
 
 
-@client.event
-async def on_component(ctx: ComponentContext):
-    con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
-                          database="s24_main")
-    cur = con.cursor()
-    if ctx.channel.id == 858986069553840138:
-        cur.execute(f"SELECT user FROM ann WHERE message={ctx.origin_message.id}")
-        if int(cur.fetchone()[0]) == ctx.author_id:
-            await ctx.origin_message.delete()
-        cur.close()
-    elif ctx.origin_message_id == 872522215785136218:
-        cur.execute("SELECT id FROM tickets WHERE id=(SELECT MAX(id) FROM tickets)")
-        channel = await ctx.guild.create_text_channel(name=f"Тикет-{cur.fetchone()[0] + 1}", overwrites={
-            ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
-            ctx.author: discord.PermissionOverwrite(read_messages=True),
-            ctx.guild.get_role(799449713451335701): discord.PermissionOverwrite(read_messages=True)
-        }, category=ctx.guild.get_channel(872495698598309918))
-        msg = await channel.send(content=f"{ctx.author.mention} опишите вашу проблему.",
-                           components=[
-                               create_actionrow(
-                                   create_button(style=ButtonStyle.red, label="Закрыть")
-                               )
-                                       ])
-        cur.execute(f"INSERT INTO tickets (channel, message) VALUES ({msg.id}, {channel.id})")
-        con.commit()
-        cur.close()
-        con.close()
-    else:
-        await ctx.channel.edit(overwrites={
-            ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
-            ctx.author: discord.PermissionOverwrite(read_messages=False),
-            ctx.guild.get_role(799449713451335701): discord.PermissionOverwrite(read_messages=True)
-        })
-        await ctx.channel.send("Тикет закрыт")
-
 @slash.component_callback()
 async def remove_ann(ctx : ComponentContext):
     con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
@@ -185,6 +150,30 @@ async def remove_ann(ctx : ComponentContext):
     cur.close()
     con.close()
 
+
+@slash.component_callback()
+async def new_ticket(ctx : ComponentContext):
+    con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
+                          database="s24_main")
+    cur = con.cursor()
+    cur.execute("SELECT id FROM tickets WHERE id=(SELECT MAX(id) FROM tickets)")
+    channel = await ctx.guild.create_text_channel(name=f"Тикет-{cur.fetchone()[0] + 1}", overwrites={
+        ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
+        ctx.author: discord.PermissionOverwrite(read_messages=True),
+        ctx.guild.get_role(799449713451335701): discord.PermissionOverwrite(read_messages=True)
+    }, category=ctx.guild.get_channel(872495698598309918))
+    msg = await channel.send(content=f"{ctx.author.mention} опишите вашу проблему.",
+                             components=[
+                                 create_actionrow(
+                                     create_button(style=ButtonStyle.red, label="Закрыть")
+                                 )
+                             ])
+    cur.execute(f"INSERT INTO tickets (channel, message) VALUES ({msg.id}, {channel.id})")
+    con.commit()
+    cur.close()
+    con.close()
+
+
 @slash.component_callback()
 async def close_ticket(ctx : ComponentContext):
     await ctx.channel.edit(overwrites={
@@ -192,6 +181,8 @@ async def close_ticket(ctx : ComponentContext):
         ctx.author: discord.PermissionOverwrite(read_messages=False),
         ctx.guild.get_role(799449713451335701): discord.PermissionOverwrite(read_messages=True)
     })
+    await ctx.channel.send(f"Тикет закрыт {ctx.author.mention}")
+
 
 def bot_stop(*args):
     global state

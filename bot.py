@@ -173,6 +173,25 @@ async def on_component(ctx: ComponentContext):
             ctx.guild.get_role(799449713451335701): discord.PermissionOverwrite(read_messages=True)
         })
 
+@slash.component_callback()
+async def remove_ann(ctx : ComponentContext):
+    con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
+                          database="s24_main")
+    cur = con.cursor()
+    cur.execute(f"SELECT user FROM ann WHERE message={ctx.origin_message.id}")
+    if int(cur.fetchone()[0]) == ctx.author_id:
+        await ctx.origin_message.delete()
+    cur.close()
+    con.close()
+
+@slash.component_callback()
+async def close_ticket(ctx : ComponentContext):
+    await ctx.channel.edit(overwrites={
+        ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
+        ctx.author: discord.PermissionOverwrite(read_messages=False),
+        ctx.guild.get_role(799449713451335701): discord.PermissionOverwrite(read_messages=True)
+    })
+
 def bot_stop(*args):
     global state
     state = 0

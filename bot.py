@@ -172,6 +172,7 @@ async def on_component(ctx: ComponentContext):
             ctx.author: discord.PermissionOverwrite(read_messages=False),
             ctx.guild.get_role(799449713451335701): discord.PermissionOverwrite(read_messages=True)
         })
+        await ctx.channel.send("Тикет закрыт")
 
 @slash.component_callback()
 async def remove_ann(ctx : ComponentContext):

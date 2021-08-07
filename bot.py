@@ -160,7 +160,8 @@ async def new_ticket(ctx : ComponentContext):
     channel = await ctx.guild.create_text_channel(name=f"Тикет-{cur.fetchone()[0] + 1}", overwrites={
         ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
         ctx.author: discord.PermissionOverwrite(read_messages=True),
-        ctx.guild.get_role(799449713451335701): discord.PermissionOverwrite(read_messages=True)
+        ctx.guild.get_role(799449713451335701): discord.PermissionOverwrite(read_messages=True),
+        ctx.guild.get_member(kolyakot33): discord.PermissionOverwrite(read_messages=True)
     }, category=ctx.guild.get_channel(872495698598309918))
     msg = await channel.send(content=f"{ctx.author.mention} опишите вашу проблему.",
                              components=[
@@ -179,7 +180,8 @@ async def close_ticket(ctx : ComponentContext):
     await ctx.channel.edit(overwrites={
         ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
         ctx.author: discord.PermissionOverwrite(read_messages=False),
-        ctx.guild.get_role(799449713451335701): discord.PermissionOverwrite(read_messages=True)
+        ctx.guild.get_role(799449713451335701): discord.PermissionOverwrite(read_messages=True),
+        ctx.guild.get_member(kolyakot33): discord.PermissionOverwrite(read_messages=True)
     }, name="(Закрыт) " + ctx.channel.name.lower())
     await ctx.channel.send(f"Тикет закрыт {ctx.author.mention}")
 

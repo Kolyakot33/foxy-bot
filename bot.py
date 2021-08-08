@@ -147,6 +147,8 @@ async def remove_ann(ctx : ComponentContext):
     cur.execute(f"SELECT user FROM ann WHERE message={ctx.origin_message.id}")
     if int(cur.fetchone()[0]) == ctx.author_id:
         await ctx.origin_message.delete()
+    else:
+        ctx.send("Ошибка: вы не создатель объявления", hidden=True', delete_after=10.0)
     cur.close()
     con.close()
 

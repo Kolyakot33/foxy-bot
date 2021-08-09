@@ -30,7 +30,7 @@ async def refresh_status():
 
 @client.event
 async def on_ready():
-    print("Ready!")
+    print("Ready")
     signal(SIGTERM, bot_stop)
     signal(SIGINT, bot_stop)
     if not refresh_status.is_running():

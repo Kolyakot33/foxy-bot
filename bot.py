@@ -98,7 +98,7 @@ async def on_message(message: discord.Message):
             elif admin.lower() == "homka":
                 embed.set_footer(text="Homka",
                                  icon_url="https://cdn.discordapp.com/attachments/843588784126033943/870815009293361173/Screenshot_74.png")
-            await message.guild.get_channel(845562544965681153).send(embed=embed, content=usr)
+            await client.get_guild(785610109723738163).get_channel(845562544965681153).send(embed=embed, content=usr)
 
         return
     elif message.content.lower().startswith("!makeann") and message.channel.id == 858986069553840138:

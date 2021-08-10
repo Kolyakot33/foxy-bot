@@ -65,7 +65,7 @@ async def on_message(message: discord.Message):
             await message.reply("Nope", delete_after=10.0)
             return
     elif message.content.lower().startswith("!pred"):
-        if message.guild.get_role(799449713451335701) in message.author.roles or message.author.id == kolyakot33:
+        if message.author.id == kolyakot33:
             try:
                 usr, reason, task, time, admin = message.content[6:].split(sep=";")
             except ValueError:
@@ -82,6 +82,24 @@ async def on_message(message: discord.Message):
                 embed.set_footer(text="Homka",
                                  icon_url="https://cdn.discordapp.com/attachments/843588784126033943/870815009293361173/Screenshot_74.png")
             await message.guild.get_channel(845562544965681153).send(embed=embed, content=usr)
+        elif message.guild.get_role(799449713451335701) in message.author.roles:
+            try:
+                usr, reason, task, time, admin = message.content[6:].split(sep=";")
+            except ValueError:
+                await message.channel.send("Ошибка в синтаксисе команды")
+            embed = discord.Embed(title="Предупреждение", description=f'{usr}, вам выдано предупреждение',
+                                  colour=int("2f3136", base=16))
+            embed.add_field(name="Причина:", value=reason)
+            embed.add_field(name="Задание для снятия:", value=task)
+            embed.add_field(name="Срок:", value=f"{time} дней")
+            if admin.lower() == "cubelius":
+                embed.set_footer(text="Cubelius",
+                                 icon_url="https://cdn.discordapp.com/attachments/843588784126033943/870812313836453948/e081d6eabcfa794d9ac10cd0626799b4.webp")
+            elif admin.lower() == "homka":
+                embed.set_footer(text="Homka",
+                                 icon_url="https://cdn.discordapp.com/attachments/843588784126033943/870815009293361173/Screenshot_74.png")
+            await message.guild.get_channel(845562544965681153).send(embed=embed, content=usr)
+
         return
     elif message.content.lower().startswith("!makeann") and message.channel.id == 858986069553840138:
         smsg = message.content[9:].split(sep=";")

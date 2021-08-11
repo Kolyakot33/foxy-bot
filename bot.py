@@ -154,6 +154,9 @@ async def on_message(message: discord.Message):
 #    message.channel.send(embed=discord.Embed(title="Создать тикет", description="Чтобы создать тикет нажми на кнопку снизу",colour=int("2f3136", base=16)).set_footer(icon_url=client.user.avatar_url, text="Фокси"),components=[create_actionrow(create_button(style=ButtonStyle.blue, label="Создать тикет", emoji=":envelope_with_arrow:",custom_id="new_ticket"))])
     elif message.channel.id == 858986069553840138:
         await message.delete()
+    elif message.content == "!getstatus" and message.author.id == kolyakot33:
+        qc = QC("135.181.126.142", port=25953)
+        await message.channel.send(qc.get_full_stats())
     return
 
 

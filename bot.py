@@ -54,8 +54,6 @@ async def on_message(message: discord.Message):
         return
     elif (
             "@everyone" in message.content.lower() or "@here" in message.content.lower()) and not message.author.guild_permissions.administrator:
-        await message.channel.send("Какой тебе ещё пинг? Бан хочешь?")
-        await message.delete()
         return
     elif message.content.lower().startswith("foxy"):
         if message.author.id == 632511458537898016:

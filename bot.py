@@ -10,7 +10,7 @@ from discord_slash.utils.manage_components import create_button, create_actionro
 from discord_slash.model import ButtonStyle
 from discord_slash import SlashCommand
 import subprocess
-from mctools import QUERYClient as QC
+from mctools import QUERYClient
 
 client = discord.Client(intents=discord.Intents.all())
 slash = SlashCommand(client, sync_commands=True)
@@ -21,12 +21,18 @@ kolyakot33 = 632511458537898016
 
 @tasks.loop(seconds=30)
 async def refresh_status():
+    # Check for updates
     process = subprocess.Popen(["git", "pull"], stdout=subprocess.PIPE)
     data = process.communicate()
     if not data[0].startswith(b"Already up to date."):
         bot_stop()
+    # change status
     await client.change_presence(status=discord.Status.idle, activity=discord.Game(
         name=f"Задержка: {int(client.latency * 1000)}мс, Аптайм: {round(int(time() - start_time) / 60.0, 2)}м"))
+    # refresh server stats
+    with QUERYClient("135.181.126.142", port=25953) as qc:
+        stats = qc.get_full_stats()
+    await client.get_channel(874921983358414878).get_partial_message(875701351269662731).edit(embed=discord.Embed(title="Информация о сервере", description="foxdream.gomc.fun").add_field(name=f"Онлайн {stats['numplayers']}/{stats['maxplayers']}"))
 
 
 @client.event
@@ -116,15 +122,14 @@ async def on_message(message: discord.Message):
             create_button(style=ButtonStyle.green, label="Удалить(только для создателя)",
                           emoji=client.get_emoji(867776679673462785), custom_id="remove_ann"))
         ])
-        con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
-                              database="s24_main")
-        cur = con.cursor()
-        cur.execute(f"INSERT INTO ann (message, user) VALUES ({msg.id}, {message.author.id})")
-        cur.execute(f"SELECT id FROM ann WHERE message={msg.id}")
-        d = cur.fetchone()[0]
-        cur.close()
-        con.commit()
-        con.close()
+        with pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
+                              database="s24_main") as con:
+            cur = con.cursor()
+            cur.execute(f"INSERT INTO ann (message, user) VALUES ({msg.id}, {message.author.id})")
+            cur.execute(f"SELECT id FROM ann WHERE message={msg.id}")
+            d = cur.fetchone()[0]
+            cur.close()
+            con.commit()
         a = msg.embeds[0]
         a.title = f"Объявление #{d}"
         await msg.edit(embed=a)
@@ -153,9 +158,6 @@ async def on_message(message: discord.Message):
 #    message.channel.send(embed=discord.Embed(title="Создать тикет", description="Чтобы создать тикет нажми на кнопку снизу",colour=int("2f3136", base=16)).set_footer(icon_url=client.user.avatar_url, text="Фокси"),components=[create_actionrow(create_button(style=ButtonStyle.blue, label="Создать тикет", emoji=":envelope_with_arrow:",custom_id="new_ticket"))])
     elif message.channel.id == 858986069553840138:
         await message.delete()
-    elif message.content == "!getstatus" and message.author.id == kolyakot33:
-        qc = QC("135.181.126.142", port=25953)
-        await message.channel.send(qc.get_full_stats())
     return
 
 

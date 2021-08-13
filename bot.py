@@ -193,7 +193,7 @@ async def new_ticket(ctx : ComponentContext):
                                      create_button(style=ButtonStyle.red, label="Закрыть", custom_id="close_ticket")
                                  )
                              ])
-    cur.execute(f"INSERT INTO tickets (channel, message) VALUES ({msg.id}, {channel.id})")
+    cur.execute(f"INSERT INTO tickets (channel, user) VALUES ({channel.id}, {ctx.author_id})")
     con.commit()
     cur.close()
     con.close()

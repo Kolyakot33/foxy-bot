@@ -32,7 +32,7 @@ async def refresh_status():
     # refresh server stats
     with QUERYClient("135.181.126.142", port=25953) as qc:
         stats = qc.get_full_stats()
-    await client.get_channel(874921983358414878).get_partial_message(875701352502804490).edit(embed=discord.Embed(title="Информация о сервере", description="foxdream.gomc.fun").add_field(name=f"Онлайн {stats['numplayers']}/{stats['maxplayers']}", value=", ".join(stats['players'])))
+    await client.get_channel(874921983358414878).get_partial_message(875701352502804490).edit(embed=discord.Embed(title="Информация о сервере", description="foxdream.gomc.fun").add_field(name=f"Онлайн {stats['numplayers']}/{stats['maxplayers']}", value=", ".join(stats['players']).replace("[0m", "")))
 
 
 @client.event

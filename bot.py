@@ -159,7 +159,7 @@ async def on_message(message: discord.Message):
     elif message.channel.id == 858986069553840138:
         await message.delete()
     elif message.content == "!getstatus" and message.author.id == kolyakot33:
-        qc = QC("135.181.126.142", port=25953)
+        qc = QUERYClient("135.181.126.142", port=25953)
         await message.channel.send(qc.get_full_stats())
     return
 

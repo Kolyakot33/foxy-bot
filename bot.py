@@ -57,8 +57,9 @@ async def on_error(*args, **kwargs):
     finally:
         print_exc()
 
-@bot.command(name="test")
-async def _test(ctx, arg):
+
+@bot.command()
+async def test(ctx, arg):
     print(arg)
 
 
@@ -234,5 +235,6 @@ def bot_stop(*args):
         task.cancel()
     asyncio.get_running_loop().stop()
     print("Stop completed!")
+
 
 bot.run('ODA1NDg3MTIxNTgxOTk4MTUx.YBbmVw.gziNetHjAmwC6vQ1I9hyBkEQyyk')

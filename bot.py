@@ -60,7 +60,7 @@ async def on_error(*args, **kwargs):
 
 @bot.command()
 async def testgg(ctx, arg):
-    print(arg)
+    await ctx.send(arg)
 
 
 @bot.event

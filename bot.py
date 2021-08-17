@@ -13,7 +13,7 @@ from discord_slash import SlashCommand
 import subprocess
 from mctools import QUERYClient
 
-bot = commands.Bot(intents=discord.Intents.all(), command_prefix="!")
+bot = commands.Bot(intents=discord.Intents.all(), command_prefix="$$")
 slash = SlashCommand(bot, sync_commands=True)
 start_time = time()
 state = 1

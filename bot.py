@@ -58,7 +58,7 @@ async def on_error(*args, **kwargs):
         print_exc()
 
 
-@bot.command()
+@commands.command()
 async def testgg(ctx, arg):
     await ctx.send(arg)
 
@@ -235,4 +235,6 @@ def bot_stop(*args):
         task.cancel()
     asyncio.get_running_loop().stop()
     print("Stop completed!")
+
+bot.add_command(testgg)
 bot.run('ODA1NDg3MTIxNTgxOTk4MTUx.YBbmVw.gziNetHjAmwC6vQ1I9hyBkEQyyk')

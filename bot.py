@@ -57,7 +57,7 @@ async def on_error(*args, **kwargs):
     finally:
         print_exc()
 
-@commands.command()
+@bot.command()
 async def test(ctx, arg):
     print(arg)
 

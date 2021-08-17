@@ -2,6 +2,7 @@ import asyncio
 from time import time, sleep
 from traceback import print_exc, format_exc
 import discord
+from discord.ext import commands
 from signal import signal, SIGINT, SIGTERM
 from discord.ext import tasks
 import pymysql
@@ -12,8 +13,8 @@ from discord_slash import SlashCommand
 import subprocess
 from mctools import QUERYClient
 
-client = discord.Client(intents=discord.Intents.all())
-slash = SlashCommand(client, sync_commands=True)
+bot = commands.Bot(intents=discord.Intents.all(), command_prefix="!")
+slash = SlashCommand(bot, sync_commands=True)
 start_time = time()
 state = 1
 kolyakot33 = 632511458537898016
@@ -27,15 +28,18 @@ async def refresh_status():
     if not data[0].startswith(b"Already up to date."):
         bot_stop()
     # change status
-    await client.change_presence(status=discord.Status.idle, activity=discord.Game(
-        name=f"Задержка: {int(client.latency * 1000)}мс, Аптайм: {round(int(time() - start_time) / 60.0, 2)}м"))
+    await bot.change_presence(status=discord.Status.idle, activity=discord.Game(
+        name=f"Задержка: {int(bot.latency * 1000)}мс, Аптайм: {round(int(time() - start_time) / 60.0, 2)}м"))
     # refresh server stats
     with QUERYClient("135.181.126.142", port=25953) as qc:
         stats = qc.get_full_stats()
-    await client.get_channel(874921983358414878).get_partial_message(875701352502804490).edit(embed=discord.Embed(title="Информация о сервере", description="foxdream.gomc.fun").add_field(name=f"Онлайн {stats['numplayers']}/{stats['maxplayers']}", value=", ".join(stats['players']).replace("[0m", "")))
+    await bot.get_channel(874921983358414878).get_partial_message(875701352502804490).edit(
+        embed=discord.Embed(title="Информация о сервере", description="foxdream.gomc.fun").add_field(
+            name=f"Онлайн {stats['numplayers']}/{stats['maxplayers']}",
+            value=", ".join(stats['players']).replace("[0m", "")))
 
 
-@client.event
+@bot.event
 async def on_ready():
     print("Ready")
     signal(SIGTERM, bot_stop)
@@ -44,19 +48,23 @@ async def on_ready():
         refresh_status.start()
 
 
-@client.event
+@bot.event
 async def on_error(*args, **kwargs):
     try:
-        await client.get_user(kolyakot33).send(format_exc())
+        await bot.get_user(kolyakot33).send(format_exc())
     except Exception as exc:
         print("Fatal Error!", exc)
     finally:
         print_exc()
 
+@commands.command()
+async def test(ctx, arg):
+    print(arg)
 
-@client.event
+
+@bot.event
 async def on_message(message: discord.Message):
-    if message.author == client.user or state == 0:
+    if message.author == bot.user or state == 0:
         return
     elif (
             "@everyone" in message.content.lower() or "@here" in message.content.lower()) and not message.author.guild_permissions.administrator:
@@ -86,7 +94,7 @@ async def on_message(message: discord.Message):
             elif admin.lower() == "homka":
                 embed.set_footer(text="Homka",
                                  icon_url="https://cdn.discordapp.com/attachments/843588784126033943/870815009293361173/Screenshot_74.png")
-            await client.get_guild(785610109723738163).get_channel(845562544965681153).send(embed=embed, content=usr)
+            await bot.get_guild(785610109723738163).get_channel(845562544965681153).send(embed=embed, content=usr)
         elif message.guild.get_role(799449713451335701) in message.author.roles:
             try:
                 usr, reason, task, time, admin = message.content[6:].split(sep=";")
@@ -119,11 +127,11 @@ async def on_message(message: discord.Message):
         embed.set_footer(icon_url=message.author.avatar_url, text=message.author.nick)
         msg = await message.channel.send(embed=embed, components=[
             create_actionrow(
-            create_button(style=ButtonStyle.green, label="Удалить(только для создателя)",
-                          emoji=client.get_emoji(867776679673462785), custom_id="remove_ann"))
+                create_button(style=ButtonStyle.green, label="Удалить(только для создателя)",
+                              emoji=bot.get_emoji(867776679673462785), custom_id="remove_ann"))
         ])
         with pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
-                              database="s24_main") as con:
+                             database="s24_main") as con:
             cur = con.cursor()
             cur.execute(f"INSERT INTO ann (message, user) VALUES ({msg.id}, {message.author.id})")
             cur.execute(f"SELECT id FROM ann WHERE message={msg.id}")
@@ -146,16 +154,18 @@ async def on_message(message: discord.Message):
         res = cur.fetchone()
         cur.close()
         con.close()
-        print(res)
-        user = client.get_user(int(res[0]))
+        if res == ():
+            await message.delete()
+            return
+        user = bot.get_user(int(res[0]))
         embed = discord.Embed(title="Покупка",
-                              description=f"{user.mention}, у вас хотят купить ресурсы по этому айди: [#{iD}]({client.get_channel(858986069553840138).get_partial_message(int(res[1])).jump_url})",
+                              description=f"{user.mention}, у вас хотят купить ресурсы по этому айди: [#{iD}]({bot.get_channel(858986069553840138).get_partial_message(int(res[1])).jump_url})",
                               colour=int("6cc789", base=16))
         embed.add_field(name="Комментарий покупателя", value=comment)
         embed.set_footer(icon_url=message.author.avatar_url, text=message.author.nick)
-        await client.get_channel(858986069553840138).send(embed=embed, content=user.mention)
+        await bot.get_channel(858986069553840138).send(embed=embed, content=user.mention)
         await message.delete()
-#    message.channel.send(embed=discord.Embed(title="Создать тикет", description="Чтобы создать тикет нажми на кнопку снизу",colour=int("2f3136", base=16)).set_footer(icon_url=client.user.avatar_url, text="Фокси"),components=[create_actionrow(create_button(style=ButtonStyle.blue, label="Создать тикет", emoji=":envelope_with_arrow:",custom_id="new_ticket"))])
+    #    message.channel.send(embed=discord.Embed(title="Создать тикет", description="Чтобы создать тикет нажми на кнопку снизу",colour=int("2f3136", base=16)).set_footer(icon_url=client.user.avatar_url, text="Фокси"),components=[create_actionrow(create_button(style=ButtonStyle.blue, label="Создать тикет", emoji=":envelope_with_arrow:",custom_id="new_ticket"))])
     elif message.channel.id == 858986069553840138:
         await message.delete()
     elif message.content == "!getstatus" and message.author.id == kolyakot33:
@@ -165,7 +175,7 @@ async def on_message(message: discord.Message):
 
 
 @slash.component_callback()
-async def remove_ann(ctx : ComponentContext):
+async def remove_ann(ctx: ComponentContext):
     con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
                           database="s24_main")
     cur = con.cursor()
@@ -179,7 +189,7 @@ async def remove_ann(ctx : ComponentContext):
 
 
 @slash.component_callback()
-async def new_ticket(ctx : ComponentContext):
+async def new_ticket(ctx: ComponentContext):
     con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
                           database="s24_main")
     cur = con.cursor()
@@ -203,7 +213,7 @@ async def new_ticket(ctx : ComponentContext):
 
 
 @slash.component_callback()
-async def close_ticket(ctx : ComponentContext):
+async def close_ticket(ctx: ComponentContext):
     await ctx.channel.edit(overwrites={
         ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
         ctx.author: discord.PermissionOverwrite(read_messages=False),
@@ -226,4 +236,4 @@ def bot_stop(*args):
     print("Stop completed!")
 
 
-client.run('ODA1NDg3MTIxNTgxOTk4MTUx.YBbmVw.gziNetHjAmwC6vQ1I9hyBkEQyyk')
+bot.run('ODA1NDg3MTIxNTgxOTk4MTUx.YBbmVw.gziNetHjAmwC6vQ1I9hyBkEQyyk')

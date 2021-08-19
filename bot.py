@@ -127,8 +127,12 @@ async def makeann(ctx: SlashContext, ann_type: str, resource: str, price: str):
         con.commit()
     embed.title = f"Объявление #{d}"
     await msg.edit(embed=embed)
-@slash.slash(name="buy", description="Купить что-то", options=[create_option(name="ID", option_type=4, description="id без #", required=True), create_option(name="comment", description="Коментарий", option_type=3, required=True)])
-async def buy(ctx : SlashContext, ID : int, comment : str):
+
+
+@slash.slash(name="buy", description="Купить что-то",
+             options=[create_option(name="id", option_type=4, description="id без #", required=True),
+                      create_option(name="comment", description="Коментарий", option_type=3, required=True)])
+async def buy(ctx: SlashContext, ID: int, comment: str):
     con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
                           database="s24_main")
     cur = con.cursor()
@@ -145,7 +149,6 @@ async def buy(ctx : SlashContext, ID : int, comment : str):
     embed.add_field(name="Комментарий покупателя", value=comment)
     embed.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author.nick)
     await bot.get_channel(858986069553840138).send(embed=embed, content=user.mention)
-
 
 
 @slash.component_callback()

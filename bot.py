@@ -57,12 +57,6 @@ async def on_error(*args, **kwargs):
     finally:
         print_exc()
 
-
-@commands.command()
-async def testgg(ctx, arg):
-    await ctx.channel.send(arg)
-
-
 @bot.event
 async def on_message(message: discord.Message):
     if message.author == bot.user or state == 0:
@@ -95,6 +89,8 @@ async def on_message(message: discord.Message):
             elif admin.lower() == "homka":
                 embed.set_footer(text="Homka",
                                  icon_url="https://cdn.discordapp.com/attachments/843588784126033943/870815009293361173/Screenshot_74.png")
+            elif admin.lower() == "pomidor":
+                embed.set_footer(text="ItsPomiDor4iK", icon_url="https://cdn.discordapp.com/attachments/873174230970273832/877718152333656125/268b20822dcee012.PNG")
             await bot.get_guild(785610109723738163).get_channel(845562544965681153).send(embed=embed, content=usr)
         elif message.guild.get_role(799449713451335701) in message.author.roles:
             try:
@@ -236,5 +232,4 @@ def bot_stop(*args):
     asyncio.get_running_loop().stop()
     print("Stop completed!")
 
-bot.add_command(testgg)
 bot.run('ODA1NDg3MTIxNTgxOTk4MTUx.YBbmVw.gziNetHjAmwC6vQ1I9hyBkEQyyk')

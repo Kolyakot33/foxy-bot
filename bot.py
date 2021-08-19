@@ -12,7 +12,7 @@ from discord_slash.utils.manage_components import create_button, create_actionro
 from discord_slash.model import ButtonStyle, SlashCommandPermissionType
 from subprocess import Popen, PIPE
 from mctools import QUERYClient
-
+quit()
 bot = commands.Bot(intents=discord.Intents.all(), command_prefix="$$")
 slash = SlashCommand(bot, sync_commands=True)
 start_time = time()

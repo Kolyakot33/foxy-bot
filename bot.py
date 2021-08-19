@@ -1,32 +1,31 @@
 import asyncio
-from time import time, sleep
+from time import time
 from traceback import print_exc, format_exc
 import discord
 from discord.ext import commands
 from signal import signal, SIGINT, SIGTERM
 from discord.ext import tasks
 import pymysql
-from discord_slash import ComponentContext
+from discord_slash import ComponentContext, SlashCommand, SlashContext
+from discord_slash.utils.manage_commands import create_option, create_permission, create_choice
 from discord_slash.utils.manage_components import create_button, create_actionrow
-from discord_slash.model import ButtonStyle
-from discord_slash import SlashCommand
-import subprocess
+from discord_slash.model import ButtonStyle, SlashCommandPermissionType
+from subprocess import Popen, PIPE
 from mctools import QUERYClient
 
 bot = commands.Bot(intents=discord.Intents.all(), command_prefix="$$")
 slash = SlashCommand(bot, sync_commands=True)
 start_time = time()
-state = 1
 kolyakot33 = 632511458537898016
 
 
 @tasks.loop(seconds=30)
 async def refresh_status():
     # Check for updates
-    process = subprocess.Popen(["git", "pull"], stdout=subprocess.PIPE)
-    data = process.communicate()
-    if not data[0].startswith(b"Already up to date."):
-        bot_stop()
+    # process = Popen(["git", "pull"], stdout=PIPE)
+    # data = process.communicate()
+    # if not data[0].startswith(b"Already up to date."):
+    #    bot_stop()
     # change status
     await bot.change_presence(status=discord.Status.idle, activity=discord.Game(
         name=f"Задержка: {int(bot.latency * 1000)}мс, Аптайм: {round(int(time() - start_time) / 60.0, 2)}м"))
@@ -57,9 +56,10 @@ async def on_error(*args, **kwargs):
     finally:
         print_exc()
 
+
 @bot.event
 async def on_message(message: discord.Message):
-    if message.author == bot.user or state == 0:
+    if message.author == bot.user:
         return
     elif (
             "@everyone" in message.content.lower() or "@here" in message.content.lower()) and not message.author.guild_permissions.administrator:
@@ -72,85 +72,80 @@ async def on_message(message: discord.Message):
         else:
             await message.reply("Nope", delete_after=10.0)
             return
-    elif message.content.lower().startswith("!pred"):
-        if message.author.id == kolyakot33 or message.guild.get_role(799449713451335701) in message.author.roles:
-            try:
-                usr, reason, task, time, admin = message.content[6:].split(sep=";")
-            except ValueError:
-                await message.channel.send("Ошибка в синтаксисе команды")
-            embed = discord.Embed(title="Предупреждение", description=f'{usr}, вам выдано предупреждение',
-                                  colour=int("2f3136", base=16))
-            embed.add_field(name="Причина:", value=reason)
-            embed.add_field(name="Задание для снятия:", value=task)
-            embed.add_field(name="Срок:", value=f"{time} дней")
-            if admin.lower() == "cubelius":
-                embed.set_footer(text="Cubelius",
-                                 icon_url="https://cdn.discordapp.com/attachments/843588784126033943/870812313836453948/e081d6eabcfa794d9ac10cd0626799b4.webp")
-            elif admin.lower() == "homka":
-                embed.set_footer(text="Homka",
-                                 icon_url="https://cdn.discordapp.com/attachments/843588784126033943/870815009293361173/Screenshot_74.png")
-            elif admin.lower() == "pomidor":
-                embed.set_footer(text="ItsPomiDor4iK", icon_url="https://cdn.discordapp.com/attachments/873174230970273832/877718152333656125/268b20822dcee012.PNG")
-            await bot.get_guild(785610109723738163).get_channel(845562544965681153).send(embed=embed, content=usr)
-        return
-    elif message.content.lower().startswith("!makeann") and message.channel.id == 858986069553840138:
-        smsg = message.content[9:].split(sep=";")
-        if len(smsg) == 3:
-            type, resource, price = smsg
-            embed = discord.Embed(title="Объявление", colour=int("2f3136", base=16))
-            embed.add_field(name="Тип", value="Продажа" if type == "1" else "Покупка")
-            embed.add_field(name="Ресурсы", value=resource)
-            embed.add_field(name="Цена", value=f"{price} <:lar:858797748924448788>")
-        else:
-            embed = discord.Embed(title="Объявление", colour=int("2f3136", base=16), description=message.content[11:])
-        embed.set_footer(icon_url=message.author.avatar_url, text=message.author.nick)
-        msg = await message.channel.send(embed=embed, components=[
-            create_actionrow(
-                create_button(style=ButtonStyle.green, label="Удалить(только для создателя)",
-                              emoji=bot.get_emoji(867776679673462785), custom_id="remove_ann"))
-        ])
-        with pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
-                             database="s24_main") as con:
-            cur = con.cursor()
-            cur.execute(f"INSERT INTO ann (message, user) VALUES ({msg.id}, {message.author.id})")
-            cur.execute(f"SELECT id FROM ann WHERE message={msg.id}")
-            d = cur.fetchone()[0]
-            cur.close()
-            con.commit()
-        a = msg.embeds[0]
-        a.title = f"Объявление #{d}"
-        await msg.edit(embed=a)
-        await message.delete()
-    elif message.content.lower().startswith("!buy"):
-        try:
-            iD, comment = message.content[5:].split(sep=';')
-        except ValueError:
-            await message.delete()
-        con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
-                              database="s24_main")
+
+
+@slash.slash(name="warn", description="Дать игроку предупреждение", options=[
+    create_option(name="player", description="Игрок которому вы хотите дать предупреждение", option_type=6,
+                  required=True),
+    create_option(name="reason", description="Причина предупреждения", option_type=3, required=True),
+    create_option(name="task", description="Задание для снятия", option_type=3, required=True),
+    create_option(name="time", description="Срок", option_type=3, required=True)])
+@slash.permission(guild_id=785610109723738163,
+                  permissions=[create_permission(785618963261685760, SlashCommandPermissionType.ROLE, True),
+                               create_permission(799449713451335701, SlashCommandPermissionType.ROLE, True)])
+async def warn(ctx: SlashContext, player: discord.User, reason: str, task: str, time: str):
+    embed = discord.Embed(title="Предупреждение", description=f'{player}, вам выдано предупреждение',
+                          colour=int("2f3136", base=16))
+    embed.add_field(name="Причина:", value=reason)
+    embed.add_field(name="Задание для снятия:", value=task)
+    embed.add_field(name="Срок:", value=f"{time} дней")
+    if ctx.author_id == 397354929288904704:
+        embed.set_footer(text="Cubelius",
+                         icon_url="https://cdn.discordapp.com/attachments/843588784126033943/870812313836453948/e081d6eabcfa794d9ac10cd0626799b4.webp")
+    elif ctx.author_id == 422190637111050240:
+        embed.set_footer(text="Homka",
+                         icon_url="https://cdn.discordapp.com/attachments/843588784126033943/870815009293361173/Screenshot_74.png")
+    elif ctx.author_id == 866255591818657792:
+        embed.set_footer(text="ItsPomiDor4iK",
+                         icon_url="https://cdn.discordapp.com/attachments/873174230970273832/877718152333656125/268b20822dcee012.PNG")
+    await bot.get_guild(785610109723738163).get_channel(845562544965681153).send(embed=embed, content=player.mention)
+
+
+@slash.slash(name="makeann", description="Сделать объявление", options=[
+    create_option(name="ann_type", description="Тип объявления", option_type=3,
+                  choices=[create_choice(name="Продажа", value="1"), create_choice(name="Покупка", value="2")],
+                  required=True), create_option(name="resource", description="Ресурс", option_type=3, required=True),
+    create_option(name="price", description="Цена", option_type=3, required=True)])
+async def makeann(ctx: SlashContext, ann_type: str, resource: str, price: str):
+    embed = discord.Embed(title="Объявление", colour=int("2f3136", base=16))
+    embed.add_field(name="Тип", value="Продажа" if ann_type == "1" else "Покупка")
+    embed.add_field(name="Ресурсы", value=resource)
+    embed.add_field(name="Цена", value=f"{price} <:lar:858797748924448788>")
+    embed.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author.nick)
+    msg = await ctx.channel.send(embed=embed, components=[
+        create_actionrow(
+            create_button(style=ButtonStyle.green, label="Удалить(только для создателя)",
+                          emoji=bot.get_emoji(867776679673462785), custom_id="remove_ann"))
+    ])
+    with pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
+                         database="s24_main") as con:
         cur = con.cursor()
-        cur.execute(f"SELECT user, message FROM ann WHERE id={int(iD)}")
-        res = cur.fetchone()
+        cur.execute(f"INSERT INTO ann (message, user) VALUES ({msg.id}, {ctx.author.id})")
+        cur.execute(f"SELECT id FROM ann WHERE message={msg.id}")
+        d = cur.fetchone()[0]
         cur.close()
-        con.close()
-        if res == ():
-            await message.delete()
-            return
-        user = bot.get_user(int(res[0]))
-        embed = discord.Embed(title="Покупка",
-                              description=f"{user.mention}, у вас хотят купить ресурсы по этому айди: [#{iD}]({bot.get_channel(858986069553840138).get_partial_message(int(res[1])).jump_url})",
-                              colour=int("6cc789", base=16))
-        embed.add_field(name="Комментарий покупателя", value=comment)
-        embed.set_footer(icon_url=message.author.avatar_url, text=message.author.nick)
-        await bot.get_channel(858986069553840138).send(embed=embed, content=user.mention)
-        await message.delete()
-    #    message.channel.send(embed=discord.Embed(title="Создать тикет", description="Чтобы создать тикет нажми на кнопку снизу",colour=int("2f3136", base=16)).set_footer(icon_url=client.user.avatar_url, text="Фокси"),components=[create_actionrow(create_button(style=ButtonStyle.blue, label="Создать тикет", emoji=":envelope_with_arrow:",custom_id="new_ticket"))])
-    elif message.channel.id == 858986069553840138:
-        await message.delete()
-    elif message.content == "!getstatus" and message.author.id == kolyakot33:
-        qc = QUERYClient("135.181.126.142", port=25953)
-        await message.channel.send(qc.get_full_stats())
-    return
+        con.commit()
+    embed.title = f"Объявление #{d}"
+    await msg.edit(embed=embed)
+@slash.slash(name="buy", description="Купить что-то", options=[create_option(name="ID", option_type=4, description="id без #", required=True), create_option(name="comment", description="Коментарий", option_type=3, required=True)])
+async def buy(ctx : SlashContext, ID : int, comment : str):
+    con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
+                          database="s24_main")
+    cur = con.cursor()
+    cur.execute(f"SELECT user, message FROM ann WHERE id={int(ID)}")
+    res = cur.fetchone()
+    cur.close()
+    con.close()
+    if res == ():
+        return
+    user = bot.get_user(int(res[0]))
+    embed = discord.Embed(title="Покупка",
+                          description=f"{user.mention}, у вас хотят купить ресурсы по этому айди: [#{ID}]({bot.get_channel(858986069553840138).get_partial_message(int(res[1])).jump_url})",
+                          colour=int("6cc789", base=16))
+    embed.add_field(name="Комментарий покупателя", value=comment)
+    embed.set_footer(icon_url=ctx.author.avatar_url, text=ctx.author.nick)
+    await bot.get_channel(858986069553840138).send(embed=embed, content=user.mention)
+
 
 
 @slash.component_callback()
@@ -203,15 +198,11 @@ async def close_ticket(ctx: ComponentContext):
 
 
 def bot_stop(*args):
-    global state
-    state = 0
-    print("Stopping...")
-    print("Waiting tasks to finish...")
-    sleep(5)
     refresh_status.stop()
     for task in asyncio.all_tasks():
         task.cancel()
     asyncio.get_running_loop().stop()
     print("Stop completed!")
+
 
 bot.run('ODA1NDg3MTIxNTgxOTk4MTUx.YBbmVw.gziNetHjAmwC6vQ1I9hyBkEQyyk')

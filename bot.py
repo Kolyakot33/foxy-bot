@@ -12,7 +12,7 @@ from discord_slash.utils.manage_components import create_button, create_actionro
 from discord_slash.model import ButtonStyle, SlashCommandPermissionType
 from subprocess import Popen, PIPE
 from mctools import QUERYClient
-quit()
+
 bot = commands.Bot(intents=discord.Intents.all(), command_prefix="$$")
 slash = SlashCommand(bot, sync_commands=True)
 start_time = time()
@@ -22,10 +22,10 @@ kolyakot33 = 632511458537898016
 @tasks.loop(seconds=30)
 async def refresh_status():
     # Check for updates
-    # process = Popen(["git", "pull"], stdout=PIPE)
-    # data = process.communicate()
-    # if not data[0].startswith(b"Already up to date."):
-    #    bot_stop()
+    process = Popen(["git", "pull"], stdout=PIPE)
+    data = process.communicate()
+    if not data[0].startswith(b"Already up to date."):
+       bot_stop()
     # change status
     await bot.change_presence(status=discord.Status.idle, activity=discord.Game(
         name=f"Задержка: {int(bot.latency * 1000)}мс, Аптайм: {round(int(time() - start_time) / 60.0, 2)}м"))
@@ -82,7 +82,8 @@ async def on_message(message: discord.Message):
     create_option(name="time", description="Срок", option_type=3, required=True)])
 @slash.permission(guild_id=785610109723738163,
                   permissions=[create_permission(785618963261685760, SlashCommandPermissionType.ROLE, True),
-                               create_permission(799449713451335701, SlashCommandPermissionType.ROLE, True)])
+                               create_permission(799449713451335701, SlashCommandPermissionType.ROLE, True),
+                               create_permission(785610109723738163, SlashCommandPermissionType.ROLE, False)])
 async def warn(ctx: SlashContext, player: discord.User, reason: str, task: str, time: str):
     embed = discord.Embed(title="Предупреждение", description=f'{player}, вам выдано предупреждение',
                           colour=int("2f3136", base=16))

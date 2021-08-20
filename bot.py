@@ -85,7 +85,7 @@ async def on_message(message: discord.Message):
                                create_permission(799449713451335701, SlashCommandPermissionType.ROLE, True),
                                create_permission(785610109723738163, SlashCommandPermissionType.ROLE, False)])
 async def warn(ctx: SlashContext, player: discord.User, reason: str, task: str, time: str):
-    embed = discord.Embed(title="Предупреждение", description=f'{player}, вам выдано предупреждение',
+    embed = discord.Embed(title="Предупреждение", description=f'{player.mention}, вам выдано предупреждение',
                           colour=int("2f3136", base=16))
     embed.add_field(name="Причина:", value=reason)
     embed.add_field(name="Задание для снятия:", value=task)

@@ -30,13 +30,14 @@ async def refresh_status():
     await bot.change_presence(status=discord.Status.idle, activity=discord.Game(
         name=f"Задержка: {int(bot.latency * 1000)}мс, Аптайм: {round(int(time() - start_time) / 60.0, 2)}м"))
     # refresh server stats
+    """
     with QUERYClient("135.181.126.142", port=25953) as qc:
         stats = qc.get_full_stats()
     await bot.get_channel(874921983358414878).get_partial_message(875701352502804490).edit(
         embed=discord.Embed(title="Информация о сервере", description="foxdream.gomc.fun").add_field(
             name=f"Онлайн {stats['numplayers']}/{stats['maxplayers']}",
             value=", ".join(stats['players']).replace("[0m", "")))
-
+    """
 
 @bot.event
 async def on_ready():

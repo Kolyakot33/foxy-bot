@@ -169,7 +169,7 @@ async def remove_ann(ctx: ComponentContext):
 
 @slash.component_callback()
 async def new_ticket(ctx: ComponentContext):
-    con = pymysql.connect(host="5.252.194.76", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
+    con = pymysql.connect(host="65.21.168.70", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
                           database="s24_main")
     cur = con.cursor()
     cur.execute("SELECT id FROM tickets WHERE id=(SELECT MAX(id) FROM tickets)")

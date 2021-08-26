@@ -209,7 +209,7 @@ def bot_stop(*args):
     asyncio.get_running_loop().stop()
     print("Stop completed!")
 
-@client.event
+@bot.event
 async def on_message(message: discord.Message):
     if message.author == client.user:
         return

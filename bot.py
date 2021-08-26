@@ -211,7 +211,7 @@ def bot_stop(*args):
 
 @bot.event
 async def on_message(message: discord.Message):
-    if message.author == client.user:
+    if message.author == bot.user:
         return
     elif message.content.lower().startswith("foxy"):
         if message.author.id == 632511458537898016:

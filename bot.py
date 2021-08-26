@@ -169,11 +169,13 @@ async def remove_ann(ctx: ComponentContext):
 
 @slash.component_callback()
 async def new_ticket(ctx: ComponentContext):
+    """
     con = pymysql.connect(host="65.21.168.70", user="u24_Gy3siZPRMr", password="!v9+4cr!bQa2Wwo=y51zeu1+",
                           database="s24_main")
     cur = con.cursor()
     cur.execute("SELECT id FROM tickets WHERE id=(SELECT MAX(id) FROM tickets)")
-    channel = await ctx.guild.create_text_channel(name=f"Тикет-{cur.fetchone()[0] + 1}", overwrites={
+    """
+    channel = await ctx.guild.create_text_channel(name=f"{hash(bot)}", overwrites={
         ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
         ctx.author: discord.PermissionOverwrite(read_messages=True),
         ctx.guild.get_role(799449713451335701): discord.PermissionOverwrite(read_messages=True),
@@ -185,10 +187,12 @@ async def new_ticket(ctx: ComponentContext):
                                      create_button(style=ButtonStyle.red, label="Закрыть", custom_id="close_ticket")
                                  )
                              ])
+    """
     cur.execute(f"INSERT INTO tickets (channel, user) VALUES ({channel.id}, {ctx.author_id})")
     con.commit()
     cur.close()
     con.close()
+    """
 
 
 @slash.component_callback()

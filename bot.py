@@ -175,7 +175,7 @@ async def new_ticket(ctx: ComponentContext):
     cur = con.cursor()
     cur.execute("SELECT id FROM tickets WHERE id=(SELECT MAX(id) FROM tickets)")
     """
-    channel = await ctx.guild.create_text_channel(name=f"{hash(bot)}", overwrites={
+    channel = await ctx.guild.create_text_channel(name=f"{hash(time())}", overwrites={
         ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
         ctx.author: discord.PermissionOverwrite(read_messages=True),
         ctx.guild.get_role(799449713451335701): discord.PermissionOverwrite(read_messages=True),

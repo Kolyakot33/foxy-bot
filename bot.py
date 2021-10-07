@@ -213,4 +213,4 @@ def bot_stop(*args):
     asyncio.get_running_loop().stop()
     print("Stop completed!")
 
-bot.run('ODA1NDg3MTIxNTgxOTk4MTUx.YBbmVw.gziNetHjAmwC6vQ1I9hyBkEQyyk')
+bot.run('ODA1NDg3MTIxNTgxOTk4MTUx.YBbmVw._tE3SixrNZD-kicNdBw3HTUvz2w')
